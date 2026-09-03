@@ -1,0 +1,18 @@
+[Unit]
+Description=Embedded Linux Demonstrator update agent
+After=local-fs.target data.mount
+RequiresMountsFor=/boot
+Wants=data.mount
+
+[Service]
+Type=simple
+User=root
+ExecStartPre=/bin/mkdir -p /data/updates
+ExecStart=/usr/sbin/eld-update-agent --daemon
+Restart=on-failure
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

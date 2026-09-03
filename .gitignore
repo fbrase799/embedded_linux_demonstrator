@@ -1,0 +1,34 @@
+# Yocto / kas (repo-root only; layers contain their own build/ directories)
+/build/
+/layers/
+/downloads/
+/sstate-cache/
+/kas-tmp/
+
+# BitBake
+*.pyc
+__pycache__/
+tmp/
+cache/
+bitbake.lock
+
+# Application
+application/embedded-linux-ui/build/
+application/embedded-linux-ui/build-target/
+*.user
+*.autosave
+.qml*
+
+# SDK
+sdk/
+*-sdk.sh
+*-toolchain-*.sh
+
+# Editor / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+__pycache__/
+*.pyc
+

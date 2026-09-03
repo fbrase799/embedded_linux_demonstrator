@@ -1,0 +1,40 @@
+# Embedded Linux Demonstrator A/B boot script.
+# Placeholders @@KERNEL_IMAGETYPE@@ and @@KERNEL_BOOTCMD@@ are substituted
+# by the rpi-u-boot-scr recipe.
+
+if test -z "${active_slot}"; then
+    setenv active_slot A
+fi
+if test -z "${bootlimit}"; then
+    setenv bootlimit 3
+fi
+if test -z "${upgrade_available}"; then
+    setenv upgrade_available 0
+fi
+if test -z "${altbootcmd}"; then
+    setenv altbootcmd 'if test "${active_slot}" = "A"; then setenv active_slot B; else setenv active_slot A; fi; setenv upgrade_available 0; setenv bootcount 0; saveenv; echo Rollback to slot ${active_slot}; run bootcmd'
+fi
+
+echo "ELD boot: slot=${active_slot} bootcount=${bootcount}/${bootlimit} upgrade_available=${upgrade_available}"
+
+if test "${active_slot}" = "B"; then
+    setenv rootdev "/dev/mmcblk0p3"
+    setenv rootpart 3
+else
+    setenv rootdev "/dev/mmcblk0p2"
+    setenv rootpart 2
+fi
+
+echo "ELD boot: root=${rootdev}"
+
+setenv bootargs "coherent_pool=1M 8250.nr_uarts=1 snd_bcm2835.enable_hdmi=1 console=serial0,115200 console=tty1 root=${rootdev} rootfstype=ext4 fsck.repair=yes rootwait cma=256M eld.slot=${active_slot}"
+
+if test -z "${fdt_addr}"; then
+    setenv fdt_addr ${fdt_addr_r}
+    fatload mmc 0:1 ${fdt_addr} ${fdtfile}
+else
+    fdt addr ${fdt_addr}
+fi
+
+fatload mmc 0:1 ${kernel_addr_r} @@KERNEL_IMAGETYPE@@
+@@KERNEL_BOOTCMD@@ ${kernel_addr_r} - ${fdt_addr}

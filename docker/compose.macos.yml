@@ -1,0 +1,19 @@
+# Overlay for Docker Desktop on macOS.
+#
+# The repository bind-mount inherits APFS case-insensitivity, and BitBake
+# refuses to use such a TMPDIR. Keep tmp on a Linux named volume and bind-mount
+# only deploy/ back so images stay visible on the host.
+#
+# Used automatically by scripts/build.sh. Manual equivalent:
+#   mkdir -p build/tmp/deploy
+#   docker compose -f docker/compose.yml -f docker/compose.macos.yml run --rm yocto \
+#       kas build kas/raspberrypi4.yml
+
+services:
+  yocto:
+    volumes:
+      - yocto-tmp:/work/build/tmp
+      - ../build/tmp/deploy:/work/build/tmp/deploy
+
+volumes:
+  yocto-tmp:

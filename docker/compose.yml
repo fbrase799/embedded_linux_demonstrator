@@ -1,0 +1,31 @@
+# Run from the repository root:
+#   docker compose -f docker/compose.yml run --rm yocto kas build kas/raspberrypi4.yml
+#
+# On macOS, also pass -f docker/compose.macos.yml (scripts/build.sh does this).
+#
+# scripts/build.sh wraps this workflow.
+
+name: embedded-linux-demonstrator
+
+services:
+  yocto:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
+    image: embedded-linux-demonstrator-yocto:ubuntu22.04
+    working_dir: /work
+    stdin_open: true
+    tty: true
+    init: true
+    shm_size: "2gb"
+    environment:
+      TERM: xterm
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
+    volumes:
+      - ..:/work
+    # BitBake refuses to run as root; the image user matches the host UID.
+    user: "${USER_ID:-1000}:${GROUP_ID:-1000}"

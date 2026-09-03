@@ -1,0 +1,15 @@
+# A/B SD card layout for the Embedded Linux Demonstrator (Raspberry Pi 4).
+#
+# Partition map (mmcblk0):
+#   p1  boot      FAT32   U-Boot, firmware, kernel, DTB, uboot.env
+#   p2  rootfs_a  ext4    Root filesystem slot A
+#   p3  rootfs_b  ext4    Root filesystem slot B (inactive until an update)
+#   p4  data      ext4    Persistent data (update packages, app state)
+#
+# Slot sizes are equal so an update of A always fits in B and vice versa.
+# Increase --fixed-size if the image no longer fits.
+
+part /boot --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot --active --align 4096 --size 128
+part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfs_a --align 4096 --fixed-size 4096
+part --source empty --ondisk mmcblk0 --fstype=ext4 --label rootfs_b --align 4096 --fixed-size 4096
+part /data --source empty --ondisk mmcblk0 --fstype=ext4 --label data --align 4096 --size 1024

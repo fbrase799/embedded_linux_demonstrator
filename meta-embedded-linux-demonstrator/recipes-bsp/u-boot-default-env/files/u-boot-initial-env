@@ -1,0 +1,18 @@
+# Complete FAT environment. U-Boot replaces the built-in env with this
+# file; it does not merge. A file with only A/B keys leaves bootcmd empty
+# and the board sits at a serial prompt (black HDMI, no Linux).
+active_slot=A
+upgrade_available=0
+bootlimit=3
+bootcount=0
+bootdelay=0
+scriptaddr=0x02400000
+kernel_addr_r=0x00080000
+fdt_addr_r=0x02600000
+fdt_high=ffffffffffffffff
+loadaddr=0x1000000
+stdin=serial
+stdout=serial
+stderr=serial
+bootcmd=echo ELD U-Boot: loading boot.scr; fatload mmc 0:1 ${scriptaddr} boot.scr && source ${scriptaddr}
+altbootcmd=if test "${active_slot}" = "A"; then setenv active_slot B; else setenv active_slot A; fi; setenv upgrade_available 0; setenv bootcount 0; saveenv; echo Rollback to slot ${active_slot}; run bootcmd

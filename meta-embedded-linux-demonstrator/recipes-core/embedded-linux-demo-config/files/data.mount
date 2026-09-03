@@ -1,0 +1,14 @@
+[Unit]
+Description=Persistent data partition
+Before=embedded-linux-ui.service eld-update-agent.service
+After=local-fs-pre.target
+DefaultDependencies=no
+
+[Mount]
+What=/dev/disk/by-label/data
+Where=/data
+Type=ext4
+Options=defaults,nofail
+
+[Install]
+WantedBy=multi-user.target

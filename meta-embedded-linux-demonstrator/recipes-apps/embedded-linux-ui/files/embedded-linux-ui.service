@@ -1,0 +1,23 @@
+[Unit]
+Description=Embedded Linux Demonstrator UI
+After=systemd-user-sessions.service data.mount local-fs.target
+Wants=data.mount
+
+[Service]
+Type=simple
+User=root
+Restart=always
+RestartSec=2
+TimeoutStartSec=90
+WorkingDirectory=/
+Environment=QT_QPA_PLATFORM=eglfs
+Environment=QT_QPA_EGLFS_ALWAYS_SET_MODE=1
+Environment=QT_QUICK_CONTROLS_STYLE=Material
+Environment=QT_QPA_FB_DRM=1
+StandardOutput=journal
+StandardError=journal
+ExecStartPre=/bin/sh -c 'for i in $(seq 1 40); do [ -e /dev/dri/card0 ] || [ -e /dev/dri/card1 ] && exit 0; sleep 0.5; done; exit 0'
+ExecStart=/usr/bin/embedded-linux-ui
+
+[Install]
+WantedBy=multi-user.target
