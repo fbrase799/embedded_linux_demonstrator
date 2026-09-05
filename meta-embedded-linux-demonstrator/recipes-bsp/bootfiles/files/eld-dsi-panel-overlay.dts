@@ -1,0 +1,18 @@
+/dts-v1/;
+/plugin/;
+
+/*
+ * Firmware display_auto_detect creates dsi_panel@0 with
+ * compatible = "raspberrypi,dsi-7inch". Scarthgap panel-simple
+ * only matches "raspberrypi,7inch-dsi". Rewrite so the panel binds.
+ */
+/ {
+    compatible = "brcm,bcm2711";
+
+    fragment@0 {
+        target-path = "/soc/dsi@7e700000/dsi_panel@0";
+        __overlay__ {
+            compatible = "raspberrypi,7inch-dsi", "simple-panel";
+        };
+    };
+};

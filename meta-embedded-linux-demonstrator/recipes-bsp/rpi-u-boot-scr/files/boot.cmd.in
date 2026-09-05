@@ -27,7 +27,7 @@ fi
 
 echo "ELD boot: root=${rootdev}"
 
-setenv bootargs "coherent_pool=1M 8250.nr_uarts=1 snd_bcm2835.enable_hdmi=1 console=serial0,115200 console=tty1 root=${rootdev} rootfstype=ext4 fsck.repair=yes rootwait cma=256M eld.slot=${active_slot}"
+setenv bootargs "coherent_pool=1M 8250.nr_uarts=1 snd_bcm2835.enable_hdmi=1 console=serial0,115200 console=tty1 root=${rootdev} rootfstype=ext4 fsck.repair=yes rootwait cma=256M eld.slot=${active_slot} video=DSI-1:720x1280@60,rotate=90"
 
 if test -z "${fdt_addr}"; then
     setenv fdt_addr ${fdt_addr_r}

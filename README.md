@@ -20,9 +20,11 @@ After boot, the device starts the Qt application automatically. The UI shows liv
 
 * Docker and Docker Compose v2
 * About 80 GB free disk space and **at least 16 GB RAM** for a Yocto build (8 GB often fails while linking `gcc-cross`)
-* Raspberry Pi 4, HDMI display, Ethernet, SD card (16 GB or larger)
+* Raspberry Pi 4, HDMI display **or official 7" DSI touchscreen**, Ethernet, SD card (16 GB or larger)
 
 The host does not need a native Yocto or Qt installation. The build container is based on **Ubuntu 22.04** as required by the PRD.
+
+The official Raspberry Pi **7" DSI** touchscreen uses the same firmware settings as Raspberry Pi OS: `display_auto_detect=1`, `dtoverlay=vc4-kms-v3d`, and `disable_fw_kms_setup=1`. Wire the ribbon to the DSI connector and 5 V / GND on the GPIO header. The kiosk drives that panel; HDMI is off while DSI is connected (eglfs cannot scale-clone the way the Pi OS desktop does).
 
 ### macOS
 
@@ -98,7 +100,7 @@ Artifacts land in `build/tmp/deploy/images/raspberrypi4-64/`:
 ## Demonstration flow
 
 1. **Build** the image with `./scripts/build.sh`.
-2. **Flash** and boot. The Qt UI starts on HDMI without logging in.
+2. **Flash** and boot. The Qt UI starts on HDMI or the official 7" DSI panel without logging in.
 3. **Device UI** shows hostname, kernel, Yocto release, application version, uptime, IP address, and current image version.
 4. **Remote debug** from the developer machine — see [docs/remote-debugging.md](docs/remote-debugging.md).
 5. **Software update**: bump `DISTRO_VERSION` in `meta-embedded-linux-demonstrator/conf/distro/eld.conf` to `1.1.0`, rebuild, copy the `.eldupdate` file to `/data/updates` on the device, and install it from the UI.

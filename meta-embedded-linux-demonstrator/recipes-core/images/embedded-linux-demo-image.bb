@@ -15,6 +15,9 @@ IMAGE_INSTALL = "\
     qtdeclarative \
     fontconfig \
     ttf-dejavu-sans \
+    libinput \
+    kernel-modules \
+    udev-rules-rpi \
     \
     embedded-linux-ui \
     embedded-linux-update-agent \
@@ -47,7 +50,7 @@ IMAGE_FSTYPES = "wic wic.bmap tar.gz eldupdate"
 IMAGE_FSTYPES:remove = "rpi-sdimg ext3 ext4"
 
 WKS_FILE = "embedded-linux-demo.wks"
-WKS_FILE_DEPENDS:append = " virtual/bootloader virtual/kernel dosfstools-native mtools-native"
+WKS_FILE_DEPENDS:append = " virtual/bootloader virtual/kernel dosfstools-native mtools-native eld-dsi-panel-overlay"
 
 # Symbols for remote debugging of the Qt application (stripped binary still ships).
 IMAGE_INSTALL:append = " embedded-linux-ui-dbg"

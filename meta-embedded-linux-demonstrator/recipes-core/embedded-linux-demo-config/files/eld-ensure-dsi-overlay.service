@@ -1,0 +1,12 @@
+[Unit]
+Description=Ensure official Raspberry Pi 7" DSI overlay in config.txt
+After=boot.mount local-fs.target
+Before=embedded-linux-ui.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/eld-ensure-dsi-overlay
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

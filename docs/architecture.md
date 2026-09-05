@@ -50,7 +50,7 @@ Defined in `meta-embedded-linux-demonstrator/conf/distro/eld.conf`:
 ```text
 +---------------------------------------------+
 | Qt 6 QML UI  (embedded-linux-ui.service)    |
-|   eglfs on DRM/KMS                          |
+|   eglfs on DRM/KMS (HDMI or official 7" DSI)|
 +---------------------------------------------+
 | Update agent  (UNIX socket /run/eld-update.sock)
 +---------------------------------------------+
@@ -101,7 +101,7 @@ The same application sources in `application/embedded-linux-ui` are compiled int
 
 ## Simplifications (documented limitations)
 
-* The **kernel and device tree live on the shared FAT boot partition**, not inside each rootfs slot. An A/B update replaces the root filesystem only. A kernel change still requires updating `/boot` (or a full SD re-flash).
+* The **kernel and device tree live on the shared FAT boot partition**, not inside each rootfs slot. An A/B update replaces the root filesystem only. A kernel change still requires updating `/boot` (or a full SD re-flash). Official 7" DSI uses `dtoverlay=vc4-kms-dsi-7inch` plus `kernel-modules`. Do not enable `display_auto_detect` as well — firmware then loads a second v2 overlay and `vc4` never creates `/dev/dri`.
 * Update bundles are **not signed**. Integrity is a SHA-256 of the rootfs tarball inside the bundle.
 * `debug-tweaks` leaves an empty root password and SSH enabled.
 

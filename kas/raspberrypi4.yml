@@ -78,17 +78,20 @@ local_conf_header:
   raspberrypi: |
     RPI_USE_U_BOOT = "1"
     ENABLE_UART = "1"
+    ENABLE_I2C = "1"
     BOOT_DELAY = "0"
     DISABLE_OVERSCAN = "1"
-    HDMI_FORCE_HOTPLUG = "1"
-    HDMI_DRIVE = "2"
-    RPI_EXTRA_CONFIG = "max_framebuffers=2\\narm_64bit=1\\n"
+    # Match Raspberry Pi OS (2026-04-21) config.txt for the official 7".
+    # Do not set hdmi_force_hotplug or dtoverlay=vc4-kms-dsi-7inch.
+    RPI_EXTRA_CONFIG = "display_auto_detect=1\\nmax_framebuffers=2\\ndisable_fw_kms_setup=1\\narm_64bit=1\\ndtoverlay=eld-dsi-panel\\n"
+    IMAGE_BOOT_FILES:append = " eld-dsi-panel.dtbo;overlays/eld-dsi-panel.dtbo"
 
   qt: |
     # Qt 6.8 treats desktop OpenGL and GLES2 as mutually exclusive.
     # Poky+x11 enables PACKAGECONFIG "gl"; the kiosk UI needs eglfs/GLES2.
+    # libinput/evdev: official 7" FT5406 touch.
     PACKAGECONFIG:remove:pn-qtbase = "gl"
-    PACKAGECONFIG:append:pn-qtbase = " eglfs gbm kms gles2 fontconfig"
+    PACKAGECONFIG:append:pn-qtbase = " eglfs gbm kms gles2 fontconfig libinput"
 
   application-src: |
     EXTERNALSRC:pn-embedded-linux-ui = "${TOPDIR}/../application/embedded-linux-ui"

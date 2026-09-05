@@ -5,6 +5,16 @@ import QtQuick.Layouts
 Window {
     id: root
 
+    // Stay on the primary output (DSI). A clone target must not swapBuffers.
+    screen: {
+        const screens = Qt.application.screens
+        for (let i = 0; i < screens.length; i++) {
+            if (screens[i].name === "DSI1" || screens[i].name === "DSI-1")
+                return screens[i]
+        }
+        return Qt.application.primaryScreen
+    }
+
     width: 1280
     height: 800
     visible: true
@@ -13,10 +23,22 @@ Window {
 
     color: "#071018"
 
-    Loader {
-        id: pageLoader
-        anchors.fill: parent
-        sourceComponent: mainPage
+    // Native DSI mode is 720x1280. When the panel is mounted landscape,
+    // rotate the UI if the kernel has not already swapped the mode.
+    readonly property bool portraitNative: height > width
+
+    Item {
+        id: stage
+        width: root.portraitNative ? root.height : root.width
+        height: root.portraitNative ? root.width : root.height
+        rotation: root.portraitNative ? 90 : 0
+        anchors.centerIn: parent
+
+        Loader {
+            id: pageLoader
+            anchors.fill: parent
+            sourceComponent: mainPage
+        }
     }
 
     function showUpdate() {
@@ -169,7 +191,13 @@ Window {
 
                                 MouseArea {
                                     anchors.fill: parent
+                                    acceptedButtons: Qt.LeftButton
                                     onClicked: root.showUpdate()
+                                }
+
+                                TapHandler {
+                                    acceptedButtons: Qt.LeftButton
+                                    onTapped: root.showUpdate()
                                 }
                             }
                         }

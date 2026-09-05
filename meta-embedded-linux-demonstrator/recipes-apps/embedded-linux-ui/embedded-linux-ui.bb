@@ -16,21 +16,32 @@ PV = "${DISTRO_VERSION}"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 EXTRA_OECMAKE += "-DAPP_VERSION=${DISTRO_VERSION}"
 
-SRC_URI += "file://embedded-linux-ui.service"
+SRC_URI += "\
+    file://embedded-linux-ui.service \
+    file://embedded-linux-ui-start \
+    file://eglfs-dsi.json \
+"
 
 SYSTEMD_SERVICE:${PN} = "embedded-linux-ui.service"
 SYSTEMD_AUTO_ENABLE = "enable"
 
 do_install:append() {
+    src="${UNPACKDIR}"
+    [ -f "${src}/embedded-linux-ui.service" ] || src="${WORKDIR}"
+
+    install -d ${D}${bindir}
+    install -d ${D}${sysconfdir}/embedded-linux-ui
     install -d ${D}${systemd_system_unitdir}
-    if [ -f "${UNPACKDIR}/embedded-linux-ui.service" ]; then
-        install -m 0644 ${UNPACKDIR}/embedded-linux-ui.service ${D}${systemd_system_unitdir}/
-    else
-        install -m 0644 ${WORKDIR}/embedded-linux-ui.service ${D}${systemd_system_unitdir}/
-    fi
+    install -m 0644 ${src}/embedded-linux-ui.service ${D}${systemd_system_unitdir}/
+    install -m 0755 ${src}/embedded-linux-ui-start ${D}${bindir}/
+    install -m 0644 ${src}/eglfs-dsi.json ${D}${sysconfdir}/embedded-linux-ui/
 }
 
-FILES:${PN} += "${systemd_system_unitdir}/embedded-linux-ui.service"
+FILES:${PN} += "\
+    ${systemd_system_unitdir}/embedded-linux-ui.service \
+    ${bindir}/embedded-linux-ui-start \
+    ${sysconfdir}/embedded-linux-ui \
+"
 
 RDEPENDS:${PN} += "\
     qtbase \
@@ -38,4 +49,5 @@ RDEPENDS:${PN} += "\
     qtdeclarative \
     fontconfig \
     ttf-dejavu-sans \
+    libinput \
 "

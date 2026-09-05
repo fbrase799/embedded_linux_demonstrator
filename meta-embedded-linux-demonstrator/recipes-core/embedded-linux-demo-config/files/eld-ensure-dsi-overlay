@@ -1,0 +1,12 @@
+#!/bin/sh
+# Match Raspberry Pi OS: firmware display_auto_detect picks v1 or v2.
+# Do not also add dtoverlay=vc4-kms-dsi-7inch (duplicate DSI node).
+set -e
+
+cfg=/boot/config.txt
+[ -f "$cfg" ] || exit 0
+
+sed -i '/dtoverlay=vc4-kms-dsi-7inch/d' "$cfg"
+grep -q "^display_auto_detect=" "$cfg" || echo "display_auto_detect=1" >> "$cfg"
+grep -q "i2c_arm=on" "$cfg" || echo "dtparam=i2c_arm=on" >> "$cfg"
+grep -q "i2c_vc=on" "$cfg" || echo "dtparam=i2c_vc=on" >> "$cfg"

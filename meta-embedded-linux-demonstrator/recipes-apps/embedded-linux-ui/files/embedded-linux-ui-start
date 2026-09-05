@@ -1,0 +1,45 @@
+#!/bin/sh
+# Drive the official 7" DSI panel when it is connected; otherwise HDMI.
+# On Pi 4 with kernel-modules, /dev/dri/card0 is often v3d (no modeset).
+# Connectors live on vc4 (usually card1).
+
+export QT_QPA_PLATFORM=eglfs
+export QT_QPA_EGLFS_ALWAYS_SET_MODE=1
+export QT_QUICK_CONTROLS_STYLE=Material
+export QT_QPA_FB_DRM=1
+
+# eglfs_kms ignores QT_QPA_EGLFS_ROTATION. Rotating evdev/libinput
+# against a still-portrait 720x1280 window makes every tap miss.
+# Keep touch 1:1 with the DRM mode. Landscape is a QML/kernel concern.
+
+for i in $(seq 1 90); do
+    if [ -e /dev/dri/card0 ] || [ -e /dev/dri/card1 ]; then
+        break
+    fi
+    sleep 0.5
+done
+
+kms_card=""
+for i in $(seq 1 40); do
+    for status in /sys/class/drm/card*-DSI-1/status /sys/class/drm/card*-DSI1/status; do
+        if [ -f "$status" ] && [ "$(cat "$status")" = "connected" ]; then
+            card=$(basename "$(dirname "$status")" | sed 's/-DSI.*//')
+            kms_card="/dev/dri/${card}"
+            break
+        fi
+    done
+    [ -n "$kms_card" ] && break
+    if ! ls /sys/class/drm/card*-DSI-1/status /sys/class/drm/card*-DSI1/status >/dev/null 2>&1; then
+        break
+    fi
+    sleep 0.5
+done
+
+if [ -n "$kms_card" ]; then
+    cfg=/run/embedded-linux-ui-kms.json
+    sed "s#\"/dev/dri/card[0-9]*\"#\"${kms_card}\"#" \
+        /etc/embedded-linux-ui/eglfs-dsi.json > "$cfg"
+    export QT_QPA_EGLFS_KMS_CONFIG="$cfg"
+fi
+
+exec /usr/bin/embedded-linux-ui "$@"
